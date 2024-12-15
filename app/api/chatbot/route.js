@@ -65,8 +65,6 @@ export async function POST(req) {
 			...history,
 		];
 
-		console.log(chatHistory);
-
 		const chatSession = model.startChat({
 			generationConfig,
 			history: chatHistory,

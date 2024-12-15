@@ -38,8 +38,7 @@ const ChatUI = () => {
 
 	const handleSendMessage = async () => {
 		setLoading(true);
-		console.log("SENDING MESSAGE");
-		console.log(inputValue);
+
 		if (!inputValue || inputValue.trim() === "") {
 			setLoading(false);
 			return;
@@ -72,7 +71,6 @@ const ChatUI = () => {
 			});
 
 			const data = await res.json();
-			console.log("data", data);
 
 			// Add chatbot response to chat history
 			setChatHistory((prevHistory) => [

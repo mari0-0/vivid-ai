@@ -87,8 +87,7 @@ export default function ChatInterface() {
 
   const handleSendMessage = async () => {
     setLoading(true);
-    console.log("SENDING MESSAGE")
-    console.log(inputValue)
+
 
     try {
       const res = await fetch("/api/chatbot", {
@@ -100,7 +99,6 @@ export default function ChatInterface() {
       });
 
       const data = await res.json();
-      console.log("data", data);
       setResponse(data.chatbotMessage);
     } catch (error) {
       console.error("Error:", error);
