@@ -15,22 +15,24 @@ export default function CreateButtons() {
 			<SidebarGroupLabel>Create New</SidebarGroupLabel>
 			<SidebarMenu>
 				<SidebarMenuItem>
-					<DialogCreateButton>
+					<DialogCreateButton variant="chat">
 						<SidebarMenuButton tooltip="New Chat">
 							<SquarePen />
 							New Chat
 						</SidebarMenuButton>
 					</DialogCreateButton>
-
-					<SidebarMenuButton tooltip="New Voice Hall">
-						<Mic />
-						New Voice Hall
-					</SidebarMenuButton>
-
-					<SidebarMenuButton tooltip="New Chat Room">
-						<MessagesSquare />
-						New Chat Room
-					</SidebarMenuButton>
+					<DialogCreateButton variant="chatRoom">
+						<SidebarMenuButton tooltip="New Voice Hall">
+							<Mic />
+							New Voice Hall
+						</SidebarMenuButton>
+					</DialogCreateButton>
+					<DialogCreateButton variant="voiceHall">
+						<SidebarMenuButton tooltip="New Chat Room">
+							<MessagesSquare />
+							New Chat Room
+						</SidebarMenuButton>
+					</DialogCreateButton>
 				</SidebarMenuItem>
 			</SidebarMenu>
 		</SidebarGroup>
