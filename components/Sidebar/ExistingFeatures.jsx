@@ -30,6 +30,7 @@ import { GetUserChatRooms } from "@/actions/chatRoom.action";
 import { GetUserVoiceHalls } from "@/actions/voiceHall.action";
 import { GetUser } from "@/actions/user.action";
 import { Button } from "../ui/button";
+import { Skeleton } from "../ui/skeleton";
 
 export default function ExistingFeatures() {
 	const { isLoaded, user } = useUser();
@@ -107,12 +108,27 @@ export default function ExistingFeatures() {
 	];
 
 	return (
-		<SidebarGroup>
-			<SidebarGroupLabel>Heal Your Minds</SidebarGroupLabel>
+		<>{user ? <SidebarGroup>
+			< SidebarGroupLabel >
+				{
+					isLoading ?
+						<Skeleton className="w-1/2 h-5" />
+						:
+						<span>
+							Heal Your Minds
+						</span>
+				}
+
+
+			</SidebarGroupLabel >
 			<SidebarMenu>
 				{isLoading ? (
 					<SidebarMenuItem>
-						<SidebarMenuButton>Loading...</SidebarMenuButton>
+						<div className="flex flex-col gap-2">
+							<Skeleton className="w-full h-5" />
+							<Skeleton className="w-full h-5" />
+							<Skeleton className="w-full h-5" />
+						</div>
 					</SidebarMenuItem>
 				) : (
 					items.map((item) => (
@@ -140,9 +156,7 @@ export default function ExistingFeatures() {
 														className="flex items-center justify-between w-full cursor-pointer"
 													>
 														<span>{subItem.title}</span>
-														<Button variant="ghost" size="icon">
-															<EllipsisVertical />
-														</Button>
+														<MenuItems />
 													</div>
 												</SidebarMenuSubButton>
 											</SidebarMenuSubItem>
@@ -154,6 +168,18 @@ export default function ExistingFeatures() {
 					))
 				)}
 			</SidebarMenu>
-		</SidebarGroup>
+		</SidebarGroup > : ""}</>
+
+
 	);
+}
+
+
+
+const MenuItems = () => {
+	return (
+		<Button variant="ghost" size="icon">
+			<EllipsisVertical />
+		</Button>
+	)
 }
