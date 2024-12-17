@@ -10,6 +10,14 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
@@ -21,7 +29,10 @@ import { CreateChatRoom } from "@/actions/chatRoom.action";
 import { CreateVoiceHall } from "@/actions/voiceHall.action";
 
 export default function DialogCreateButton({ variant, children }) {
-	const [chatInput, setChatInput] = useState("");
+	const [chatInput, setChatInput] = useState({
+		title: "",
+		tone: "Calm",
+	});
 	const [chatRoomInput, setChatRoomInput] = useState({
 		name: "",
 		slug: "",
@@ -38,7 +49,7 @@ export default function DialogCreateButton({ variant, children }) {
 
 	const handleCreateChat = async () => {
 		const userId = user.publicMetadata.userId;
-		const chat = await CreateChat({ userId, title: chatInput });
+		const chat = await CreateChat({ userId, ...chatInput });
 		console.log(chat);
 	};
 
@@ -59,10 +70,6 @@ export default function DialogCreateButton({ variant, children }) {
 		});
 		console.log(voiceHall);
 	};
-
-	useEffect(() => {
-		console.log(voiceHallInput);
-	}, [voiceHallInput]);
 
 	const handleChatRoomChange = (e) => {
 		if (typeof e === "boolean") {
@@ -109,9 +116,35 @@ export default function DialogCreateButton({ variant, children }) {
 							Create a new chat to talk afresh to the bot.
 						</DialogDescription>
 					</DialogHeader>
-					<div className="mt-2 grid flex-1 gap-2">
-						<Label>Name</Label>
-						<Input id="link" onChange={(e) => setChatInput(e.target.value)} />
+					<div className="flex flex-col gap-3">
+						<div className="flex flex-col gap-2">
+							<Label>Name</Label>
+							<Input
+								id="title"
+								onChange={(e) =>
+									setChatInput((prev) => ({ ...prev, title: e.target.value }))
+								}
+							/>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Label>Tone</Label>
+							<Select
+								onValueChange={(tone) =>
+									setChatInput((prev) => ({ ...prev, tone: tone }))
+								}
+							>
+								<SelectTrigger className="w-[180px]">
+									<SelectValue placeholder="Calm" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="Calm">Calm</SelectItem>
+									<SelectItem value="Positive">Positive</SelectItem>
+									<SelectItem value="Friendly">Friendly</SelectItem>
+									<SelectItem value="Philosophical">Philosophical</SelectItem>
+									<SelectItem value="Encouraging">Encouraging</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
 					</div>
 					<DialogFooter className="sm:justify-start">
 						<DialogClose asChild>

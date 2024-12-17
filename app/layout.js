@@ -1,8 +1,12 @@
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/helpers/theme-provider";
 import { ClerkProvider } from "@clerk/nextjs";
-import { dark, neobrutalism } from "@clerk/themes";
+import { dark } from "@clerk/themes";
+import SignInButton from "@/components/Chatbot/SignInButton";
+import { AppSidebar } from "@/components/Sidebar/app-sidebar";
+import ToggleThemeBtn from "@/components/helpers/toggleTheme";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -26,7 +30,6 @@ export default function RootLayout({ children }) {
 			appearance={{
 				baseTheme: [dark],
 			}}
-      
 		>
 			<html lang="en" suppressHydrationWarning>
 				<body className={`${geistSans.variable} ${geistMono.variable}`}>
@@ -35,7 +38,21 @@ export default function RootLayout({ children }) {
 						defaultTheme="light"
 						disableTransitionOnChange
 					>
-						{children}
+						<SidebarProvider>
+							<AppSidebar />
+							<main className="w-full dark:bg-neutral-800 dark:text-white">
+								<div className="w-full h-[6vh] p-2 flex justify-between">
+									<SidebarTrigger />
+									<div className="flex items-center gap-4">
+										<ToggleThemeBtn />
+										<SignInButton />
+									</div>
+								</div>
+								<div className="w-full h-[94vh] flex justify-center items-center">
+									{children}
+								</div>
+							</main>
+						</SidebarProvider>
 					</ThemeProvider>
 				</body>
 			</html>

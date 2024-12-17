@@ -31,6 +31,7 @@ import { GetUserVoiceHalls } from "@/actions/voiceHall.action";
 import { GetUser } from "@/actions/user.action";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
+import Link from "next/link";
 
 export default function ExistingFeatures() {
 	const { isLoaded, user } = useUser();
@@ -84,7 +85,7 @@ export default function ExistingFeatures() {
 			isActive: true,
 			items: chats.map((chat) => ({
 				title: chat.title || "Untitled Chat",
-				url: `/chats/${chat._id}`, // Adjust URL as needed
+				url: `/chat/${chat._id}`, // Adjust URL as needed
 			})),
 		},
 		{
@@ -93,7 +94,7 @@ export default function ExistingFeatures() {
 			isActive: false,
 			items: voiceHalls.map((hall) => ({
 				title: hall.name,
-				url: `/voice-halls/${hall.slug}`,
+				url: `/voice-hall/${hall.slug}`,
 			})),
 		},
 		{
@@ -102,84 +103,83 @@ export default function ExistingFeatures() {
 			isActive: false,
 			items: chatRooms.map((room) => ({
 				title: room.name,
-				url: `/chat-rooms/${room.slug}`,
+				url: `/chat-room/${room.slug}`,
 			})),
 		},
 	];
 
 	return (
-		<>{user ? <SidebarGroup>
-			< SidebarGroupLabel >
-				{
-					isLoading ?
-						<Skeleton className="w-1/2 h-5" />
-						:
-						<span>
-							Heal Your Minds
-						</span>
-				}
-
-
-			</SidebarGroupLabel >
-			<SidebarMenu>
-				{isLoading ? (
-					<SidebarMenuItem>
-						<div className="flex flex-col gap-2">
-							<Skeleton className="w-full h-5" />
-							<Skeleton className="w-full h-5" />
-							<Skeleton className="w-full h-5" />
-						</div>
-					</SidebarMenuItem>
-				) : (
-					items.map((item) => (
-						<Collapsible
-							key={item.title}
-							asChild
-							defaultOpen={item.isActive}
-							className="group/collapsible"
-						>
+		<>
+			{user ? (
+				<SidebarGroup>
+					<SidebarGroupLabel>
+						{isLoading ? (
+							<Skeleton className="w-1/2 h-5" />
+						) : (
+							<span>Heal Your Minds</span>
+						)}
+					</SidebarGroupLabel>
+					<SidebarMenu>
+						{isLoading ? (
 							<SidebarMenuItem>
-								<CollapsibleTrigger asChild>
-									<SidebarMenuButton tooltip={item.title}>
-										{item.icon && <item.icon />}
-										<span>{item.title}</span>
-										<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-									</SidebarMenuButton>
-								</CollapsibleTrigger>
-								<CollapsibleContent>
-									<SidebarMenuSub>
-										{item.items?.map((subItem) => (
-											<SidebarMenuSubItem key={subItem.title}>
-												<SidebarMenuSubButton asChild>
-													<div
-														// href={subItem.url}
-														className="flex items-center justify-between w-full cursor-pointer"
-													>
-														<span>{subItem.title}</span>
-														<MenuItems />
-													</div>
-												</SidebarMenuSubButton>
-											</SidebarMenuSubItem>
-										))}
-									</SidebarMenuSub>
-								</CollapsibleContent>
+								<div className="flex flex-col gap-2">
+									<Skeleton className="w-full h-5" />
+									<Skeleton className="w-full h-5" />
+									<Skeleton className="w-full h-5" />
+								</div>
 							</SidebarMenuItem>
-						</Collapsible>
-					))
-				)}
-			</SidebarMenu>
-		</SidebarGroup > : ""}</>
-
-
+						) : (
+							items.map((item) => (
+								<Collapsible
+									key={item.title}
+									asChild
+									defaultOpen={item.isActive}
+									className="group/collapsible"
+								>
+									<SidebarMenuItem>
+										<CollapsibleTrigger asChild>
+											<SidebarMenuButton tooltip={item.title}>
+												{item.icon && <item.icon />}
+												<span>{item.title}</span>
+												<ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+											</SidebarMenuButton>
+										</CollapsibleTrigger>
+										<CollapsibleContent>
+											<SidebarMenuSub>
+												{item.items?.map((subItem) => (
+													<SidebarMenuSubItem key={subItem.title}>
+														<Link href={subItem.url}>
+															<SidebarMenuSubButton asChild>
+																<div
+																	// href={subItem.url}
+																	className="flex items-center justify-between w-full cursor-pointer"
+																>
+																	<span>{subItem.title}</span>
+																	<MenuItems />
+																</div>
+															</SidebarMenuSubButton>
+														</Link>
+													</SidebarMenuSubItem>
+												))}
+											</SidebarMenuSub>
+										</CollapsibleContent>
+									</SidebarMenuItem>
+								</Collapsible>
+							))
+						)}
+					</SidebarMenu>
+				</SidebarGroup>
+			) : (
+				""
+			)}
+		</>
 	);
 }
-
-
 
 const MenuItems = () => {
 	return (
 		<Button variant="ghost" size="icon">
 			<EllipsisVertical />
 		</Button>
-	)
-}
+	);
+};
