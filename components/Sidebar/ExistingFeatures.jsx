@@ -19,15 +19,14 @@ import {
 import {
 	BotMessageSquare,
 	ChevronRight,
-	Ellipsis,
-	EllipsisVertical,
 	MessagesSquare,
 	Mic,
+	Trash,
 } from "lucide-react";
 import { useUser } from "@clerk/nextjs";
-import { GetUserChats } from "@/actions/chat.action";
-import { GetUserChatRooms } from "@/actions/chatRoom.action";
-import { GetUserVoiceHalls } from "@/actions/voiceHall.action";
+import { DeleteChat, GetUserChats } from "@/actions/chat.action";
+import { DeleteChatRoom, GetUserChatRooms } from "@/actions/chatRoom.action";
+import { DeleteVoiceHall, GetUserVoiceHalls } from "@/actions/voiceHall.action";
 import { GetUser } from "@/actions/user.action";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
@@ -39,6 +38,7 @@ export default function ExistingFeatures() {
 	const [chatRooms, setChatRooms] = useState([]);
 	const [voiceHalls, setVoiceHalls] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
+	
 
 	useEffect(() => {
 		if (isLoaded && user) {
@@ -83,27 +83,33 @@ export default function ExistingFeatures() {
 			title: "Your Chats",
 			icon: BotMessageSquare, // Replace with an appropriate icon
 			isActive: true,
+			type: "chat",
 			items: chats.map((chat) => ({
 				title: chat.title || "Untitled Chat",
 				url: `/chat/${chat._id}`, // Adjust URL as needed
+				_id: chat._id,
 			})),
 		},
 		{
 			title: "Voice Halls",
 			icon: Mic, // Replace with an appropriate icon
 			isActive: false,
+			type: "voiceHall",
 			items: voiceHalls.map((hall) => ({
 				title: hall.name,
 				url: `/voice-hall/${hall.slug}`,
+				_id: hall._id,
 			})),
 		},
 		{
 			title: "Chat Rooms",
 			icon: MessagesSquare, // Replace with an appropriate icon
 			isActive: false,
+			type: "chatRoom",
 			items: chatRooms.map((room) => ({
 				title: room.name,
 				url: `/chat-room/${room.slug}`,
+				_id: room._id,
 			})),
 		},
 	];
@@ -129,9 +135,9 @@ export default function ExistingFeatures() {
 								</div>
 							</SidebarMenuItem>
 						) : (
-							items.map((item) => (
+							items.map((item, i) => (
 								<Collapsible
-									key={item.title}
+									key={i}
 									asChild
 									defaultOpen={item.isActive}
 									className="group/collapsible"
@@ -145,20 +151,17 @@ export default function ExistingFeatures() {
 											</SidebarMenuButton>
 										</CollapsibleTrigger>
 										<CollapsibleContent>
-											<SidebarMenuSub>
-												{item.items?.map((subItem) => (
-													<SidebarMenuSubItem key={subItem.title}>
-														<Link href={subItem.url}>
+											<SidebarMenuSub >
+												{item.items?.map((subItem, i) => (
+													<SidebarMenuSubItem key={i} className="flex items-center ">
+														<Link href={subItem.url} className="w-full">
 															<SidebarMenuSubButton asChild>
-																<div
-																	// href={subItem.url}
-																	className="flex items-center justify-between w-full cursor-pointer"
-																>
+																<div className=" flex items-center justify-between w-full cursor-pointer">
 																	<span>{subItem.title}</span>
-																	<MenuItems />
 																</div>
 															</SidebarMenuSubButton>
 														</Link>
+														<MenuItems type={item.type} _id={subItem._id} fetchData={fetchData}/>
 													</SidebarMenuSubItem>
 												))}
 											</SidebarMenuSub>
@@ -176,10 +179,34 @@ export default function ExistingFeatures() {
 	);
 }
 
-const MenuItems = () => {
+const MenuItems = ({ type, _id, fetchData }) => {
+	const handleChatDelete = async () => {
+		console.log(_id);
+		const chat = await DeleteChat(_id);
+		console.log("chat deleted:", chat);
+		fetchData();
+	};
+
+	const handleChatRoomDelete = async () => {
+		console.log(_id);
+		const chat = await DeleteChatRoom(_id);
+		console.log("chat room deleted:", chat);
+		fetchData();
+	};
+
+	const handleVoiceHallDelete = async () => {
+		console.log(_id);
+		const chat = await DeleteVoiceHall(_id);
+		console.log("voice hall deleted:", chat);
+		fetchData();
+	};
+
+	const handleFunction = type === "chat" ? handleChatDelete : type === "chatRoom" ? handleChatRoomDelete : handleVoiceHallDelete;
 	return (
-		<Button variant="ghost" size="icon">
-			<EllipsisVertical />
+		<Button variant="ghost" size="icon" onClick={handleFunction}>
+			<span className="text-neutral-600">
+				<Trash />
+			</span>
 		</Button>
 	);
 };

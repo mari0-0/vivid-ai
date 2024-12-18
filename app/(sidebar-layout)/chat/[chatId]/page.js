@@ -1,13 +1,17 @@
 "use client";
 
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { AudioLines, MessageCircle, Mic, Send, X } from "lucide-react";
 import useSpeechRecognition from "@/hooks/speechRecognition";
 import { useEffect, useState } from "react";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useParams } from "next/navigation";
+import { AddMessageToChat, GetChat, GetChatHistory } from "@/actions/chat.action";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const ChatUI = () => {
+	const { chatId } = useParams();
 	const [chatHistory, setChatHistory] = useState([]); // Store the chat history
 	const [inputValue, setInputValue] = useState(""); // Store the user input value
 	const [processedTranscript, setProcessedTranscript] = useState(""); // Store the processed transcript
@@ -24,6 +28,19 @@ const ChatUI = () => {
 		}
 	}, [transcript, processedTranscript]);
 
+	useEffect(() => {
+		const fetchHistory = async () => {
+			try {
+				const history = await GetChatHistory(chatId);
+				setChatHistory(history);
+			} catch (error) {
+				console.error("Error fetching chat history:", error);
+			}
+		};
+
+		fetchHistory();
+	}, [chatId]);
+
 	const handleToggleListening = () => {
 		if (listening) {
 			stopListening();
@@ -36,6 +53,13 @@ const ChatUI = () => {
 		setInputValue(e.target.value); // Allow manual input by the user
 	};
 
+	const handleKeyDown = (e) => {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault(); // Prevent new line on Enter key press
+			handleSendMessage(); // Call the send message function
+		}
+	};
+
 	const handleSendMessage = async () => {
 		setLoading(true);
 
@@ -43,21 +67,28 @@ const ChatUI = () => {
 			setLoading(false);
 			return;
 		}
-
+		const userInput = {
+			role: "user",
+			content: inputValue,
+		};
 		// Add user input to chat history
-		setChatHistory((prevHistory) => [
-			...prevHistory,
-			{
-				role: "user",
-				parts: [
-					{
-						text: inputValue,
-					},
-				],
-			},
-		]);
+		setChatHistory((prevHistory) => [...prevHistory, userInput]);
 
 		try {
+			await AddMessageToChat(chatId, userInput);
+
+			const chat = await GetChat(chatId)
+			console.log(chat)
+			const formattedMessages = chatHistory.map((message) => ({
+				role: message.role,
+				parts: [
+					{
+						text: message.content,
+					},
+				],
+			}));
+
+			console.log(chatHistory, formattedMessages);
 			const res = await fetch("/api/chatbot", {
 				method: "POST",
 				headers: {
@@ -66,24 +97,20 @@ const ChatUI = () => {
 				body: JSON.stringify({
 					message: inputValue,
 					tone: "Calm",
-					history: chatHistory,
+					history: formattedMessages,
 				}),
 			});
 
 			const data = await res.json();
 
-			// Add chatbot response to chat history
-			setChatHistory((prevHistory) => [
-				...prevHistory,
-				{
-					role: "model",
-					parts: [
-						{
-							text: data.chatbotMessage,
-						},
-					],
-				},
-			]);
+			const botMessage = {
+				role: "model",
+				content: data.chatbotMessage,
+			};
+			console.log("response", botMessage);
+
+			await AddMessageToChat(chatId, botMessage);
+			setChatHistory((prevHistory) => [...prevHistory, botMessage]);
 		} catch (error) {
 			console.error("Error:", error);
 			setChatHistory((prevHistory) => [
@@ -102,37 +129,22 @@ const ChatUI = () => {
 		setInputValue(""); // Clear input after sending
 	};
 
-	const handleKeyDown = (e) => {
-		if (e.key === "Enter" && !e.shiftKey) {
-			e.preventDefault(); // Prevent new line on Enter key press
-			handleSendMessage(); // Call the send message function
-		}
-	};
-
 	return (
 		<div className="w-full h-full flex flex-col justify-center items-center ">
-			<ScrollArea className="w-[70%] h-[90%] pb-4">
+			<ScrollArea className="w-[80%] h-[90%] pb-4 pr-2">
 				<div className="w-full h-full flex justify-end items-end flex-col gap-6">
-					{chatHistory.map((message, index) => (
-						<ChatBubble key={index} variant={message.role}>
-							{message.parts[0].text}
+					{chatHistory.map((msg, index) => (
+						<ChatBubble key={index} variant={msg.role}>
+							{msg.content}
 						</ChatBubble>
 					))}
 
-					{loading && (
-						<ChatBubble variant="model">
-							<div className="flex items-center gap-2">
-								<div className="w-3 h-3 bg-zinc-300 dark:bg-zinc-700 rounded-full animate-ping" />
-								<span>Thinking...</span>
-							</div>
-						</ChatBubble>
-					)}
+					{loading && <Skeleton className="w-24 h-12 self-start" />}
 				</div>
-				<ScrollBar />
 			</ScrollArea>
 
 			<div className="w-full h-[10%] pt-2 flex justify-center items-start">
-				<div className="w-[70%] relative flex flex-wrap gap-2">
+				<div className="w-[80%] relative flex flex-wrap gap-2">
 					<div className="relative flex-1 min-w-[200px]">
 						<Input
 							placeholder="Type your prompt here..."
@@ -195,7 +207,7 @@ export const ChatBubble = ({ variant, children }) => {
 
 	return (
 		<div
-			className={`max-w-[85%] md:max-w-[60%] px-5 py-4 rounded-md border bg-zinc-100 dark:bg-neutral-700 border-zinc-200 dark:border-zinc-600 text-zinc-900 dark:text-white ${
+			className={`max-w-[85%] md:max-w-[75%] px-5 py-4 rounded-md border bg-zinc-100 dark:bg-neutral-700 border-zinc-200 dark:border-zinc-600 text-zinc-900 dark:text-white ${
 				isUser ? "" : "self-start "
 			} text-xs sm:text-sm md:text-[15px] text-justify tracking-wide shadow-lg`}
 		>

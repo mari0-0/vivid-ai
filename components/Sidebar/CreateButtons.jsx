@@ -21,13 +21,13 @@ export default function CreateButtons() {
 							New Chat
 						</SidebarMenuButton>
 					</DialogCreateButton>
-					<DialogCreateButton variant="chatRoom">
+					<DialogCreateButton variant="voiceHall">
 						<SidebarMenuButton tooltip="New Voice Hall">
 							<Mic />
 							New Voice Hall
 						</SidebarMenuButton>
 					</DialogCreateButton>
-					<DialogCreateButton variant="voiceHall">
+					<DialogCreateButton variant="chatRoom">
 						<SidebarMenuButton tooltip="New Chat Room">
 							<MessagesSquare />
 							New Chat Room

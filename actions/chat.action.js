@@ -91,9 +91,6 @@ export async function DeleteChat(chatId) {
       throw new Error("Chat not found");
     }
 
-    // Delete all messages associated with the chat
-    await Message.deleteMany({ chatId });
-
     return JSON.parse(JSON.stringify(chat));
   } catch (err) {
     console.error("Error deleting chat and its messages:", err);

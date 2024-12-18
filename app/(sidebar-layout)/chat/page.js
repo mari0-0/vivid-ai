@@ -2,23 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import useSoundVolume from "@/hooks/SoundAnimation";
 import useSpeechRecognition from "@/hooks/speechRecognition";
 
-import {
-	Mic,
-	Send,
-	BookMarked,
-	FileType,
-	Languages,
-	AudioLines,
-	X,
-	MessageCircle,
-} from "lucide-react";
+import { Mic, Send, AudioLines, X, MessageCircle } from "lucide-react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
+import { ScrollArea } from "@radix-ui/react-scroll-area";
+import { ScrollBar } from "@/components/ui/scroll-area";
 
 export default function InitialCard() {
 	const [tone, setTone] = useState("Calm");
@@ -107,10 +99,10 @@ export default function InitialCard() {
 	};
 
 	return (
-		<div className="w-full min-h-[37rem] max-w-sm md:max-w-2xl mx-auto p-6 bg-neutral-50 dark:bg-zinc-900 rounded-3xl overflow-x-auto transition-colors duration-200 flex flex-col">
+		<div className="w-full min-h-[37rem] max-w-md md:max-w-2xl mx-auto p-6 bg-neutral-50 dark:bg-zinc-900 rounded-3xl overflow-x-auto transition-colors duration-200 flex flex-col">
 			<div className="w-full h-full flex-1 relative flex flex-col justify-center items-center transition-all ease-in-out">
 				<div
-					className="mb-4 w-12 h-12 flex justify-center items-center rounded-full"
+					className="mb-8 w-36 h-36 flex justify-center items-center rounded-full"
 					ref={visualizerRef}
 				>
 					<img
@@ -133,57 +125,16 @@ export default function InitialCard() {
 					<h1 className="text-2xl font-medium text-zinc-900 dark:text-white mb-2">
 						How can I help you today?
 					</h1>
-					<p className="text-sm text-zinc-600 dark:text-zinc-400">
+					<p className="text-sm max-w-xs text-zinc-600 dark:text-zinc-400">
 						This code will display a prompt asking the user for their name, and
 						then it will display a greeting message with the name entered by the
 						user.
 					</p>
 				</div>
-
-				<div
-					className="flex overflow-x-auto gap-4 mb-8 pb-4"
-					ref={(el) => (contentToHideRef.current[1] = el)}
-				>
-					{[
-						{
-							icon: BookMarked,
-							title: "Saved Prompt Templates",
-							description:
-								"User's save and reuse prompt templates for faster responses.",
-						},
-						{
-							icon: FileType,
-							title: "Media Type Selection",
-							description: "Users select media type for tailored interactions.",
-						},
-						{
-							icon: Languages,
-							title: "Multilingual Support",
-							description: "Choose language for better interaction.",
-						},
-					].map((feature, index) => (
-						<Card
-							key={index}
-							className="p-4 bg-zinc-100 dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 w-1/3"
-						>
-							<div className="flex flex-col items-center text-center gap-2">
-								<div className="p-2 bg-zinc-200 dark:bg-zinc-700 rounded-lg">
-									<feature.icon className="w-5 h-5 text-zinc-700 dark:text-white" />
-								</div>
-								<h3 className="font-medium text-zinc-900 dark:text-white">
-									{feature.title}
-								</h3>
-								<p className="text-xs text-zinc-600 dark:text-zinc-400">
-									{feature.description}
-								</p>
-							</div>
-						</Card>
-					))}
-				</div>
 			</div>
 
 			<div className="w-full">
-				<div className="flex overflow-x-auto gap-4 mb-6 text-sm pb-2">
+				<ScrollArea className="flex gap-4 mb-6 text-sm pb-2 overflow-auto">
 					{["Calm", "Positive", "Friendly", "Philosophical", "Encouraging"].map(
 						(filter) => (
 							<Button
@@ -198,7 +149,8 @@ export default function InitialCard() {
 							</Button>
 						)
 					)}
-				</div>
+					<ScrollBar orientation="horizontal" />
+				</ScrollArea>
 
 				{/* Input Field */}
 				<div className="flex flex-wrap gap-2">

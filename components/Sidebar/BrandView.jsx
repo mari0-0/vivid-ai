@@ -18,7 +18,7 @@ export default function BrandView() {
 							<img src="/logo.png" alt="logo" className="rounded-full" />
 						</div>
 						<h1 className="grid flex-1 text-left text-[16px] font-bold">
-							Vivid AI
+							Healify AI
 						</h1>
 					</SidebarMenuButton>
 				</DropdownMenu>

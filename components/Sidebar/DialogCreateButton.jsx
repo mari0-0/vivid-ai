@@ -17,16 +17,16 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CreateChat } from "@/actions/chat.action";
 import { useUser } from "@clerk/nextjs";
 import { Switch } from "../ui/switch";
 import { CreateChatRoom } from "@/actions/chatRoom.action";
 import { CreateVoiceHall } from "@/actions/voiceHall.action";
+import { useRouter } from "next/navigation";
 
 export default function DialogCreateButton({ variant, children }) {
 	const [chatInput, setChatInput] = useState({
@@ -46,11 +46,13 @@ export default function DialogCreateButton({ variant, children }) {
 	});
 
 	const { isLoaded, user } = useUser();
+	const router = useRouter();
 
 	const handleCreateChat = async () => {
 		const userId = user.publicMetadata.userId;
 		const chat = await CreateChat({ userId, ...chatInput });
 		console.log(chat);
+		router.push(`/chat/${chat._id}`);
 	};
 
 	const handleCreateChatRoom = async () => {
@@ -60,6 +62,7 @@ export default function DialogCreateButton({ variant, children }) {
 			createdBy: userId,
 		});
 		console.log(chatRoom);
+		router.push(`/chat-room/${chatRoom._id}`);
 	};
 
 	const handleCreateVoiceHall = async () => {
@@ -69,6 +72,7 @@ export default function DialogCreateButton({ variant, children }) {
 			createdBy: userId,
 		});
 		console.log(voiceHall);
+		router.push(`/voice-hall/${voiceHall._id}`);
 	};
 
 	const handleChatRoomChange = (e) => {
